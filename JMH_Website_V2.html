@@ -1973,6 +1973,7 @@ html:not(.gsap-on) .nav-underline { display: none; }
        (hero excluded: it gets its own load timeline below) */
     document.querySelectorAll('section[data-section]').forEach(function (sec) {
       if (sec.id === 'top') return;
+      if (sec.id === 'closer') return;              /* closer owns its slow "exhale" timeline */
       if (sec.classList.contains('psec')) return;   /* pillars 05–08 own their directional entrance */
       var els = Array.prototype.slice.call(sec.querySelectorAll('[data-reveal]'));
       if (!els.length) return;
@@ -2280,6 +2281,35 @@ html:not(.gsap-on) .nav-underline { display: none; }
       if (spot) gsap.to(spot, { yPercent: 16, ease: 'none',
         scrollTrigger: { trigger: sec, start: 'top bottom', end: 'bottom top', scrub: 0.6 } });
     });
+
+    /* ══ 09 CLOSER — "the exhale" (calmer, slower than the rest) ══ */
+    (function () {
+      var sec = document.getElementById('closer');
+      if (!sec) return;
+      var art = sec.querySelector('.closer-art');
+      var kicker = sec.querySelector('.kicker');
+      var h2 = sec.querySelector('h2');
+      var lead = sec.querySelector('.lead');
+      var chipsWrap = sec.querySelector('.chips');
+      var chips = sec.querySelectorAll('.chip');
+      var tag = sec.querySelector('.footer .tag');
+
+      gsap.set(art, { autoAlpha: 0, y: 46 });
+      gsap.set([kicker, h2, lead], { autoAlpha: 0, y: 32 });
+      gsap.set(chipsWrap, { autoAlpha: 1, y: 0 });
+      gsap.set(chips, { autoAlpha: 0, y: 20, scale: 0.82, transformOrigin: '50% 50%' });
+      if (tag) gsap.set(tag, { autoAlpha: 0, y: 10 });
+
+      var tl = gsap.timeline({ paused: true, defaults: { ease: EASE_HERO } });
+      tl.to(art, { autoAlpha: 1, y: 0, duration: 1.1 }, 0)                 /* slow, calm arrival */
+        .to(kicker, { autoAlpha: 1, y: 0, duration: 0.6 }, 0.5)
+        .to(h2, { autoAlpha: 1, y: 0, duration: 0.8 }, 0.62)
+        .to(lead, { autoAlpha: 1, y: 0, duration: 0.7 }, 0.84)
+        .to(chips, { autoAlpha: 1, y: 0, scale: 1, duration: 0.6, ease: 'back.out(2)', stagger: 0.1 }, 1.02)
+        .to(tag, { autoAlpha: 1, y: 0, duration: 0.7 }, 1.55);            /* tagline fades last, after a beat */
+
+      ScrollTrigger.create({ trigger: sec, start: 'top 66%', once: true, onEnter: function () { tl.play(); } });
+    })();
 
     /* scroll progress bar */
     gsap.to('.progress', { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: 0.3 } });
