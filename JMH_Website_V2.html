@@ -748,8 +748,15 @@ html:not(.gsap-on) .nav-underline { display: none; }
   position: relative; overflow: hidden;
   background: radial-gradient(ellipse 100% 60% at 50% 0%, var(--blue-10) 0%, var(--bg) 70%);
 }
+/* scrubbed "landing" wash — deepens as the closer fills the viewport */
+.closer-wash {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0;
+  background: radial-gradient(ellipse 130% 95% at 50% 55%,
+    oklch(0.885 0.048 245) 0%, oklch(0.930 0.024 245) 52%, transparent 82%);
+}
+.closer-inner, .closer .footer { position: relative; z-index: 1; }
 .closer-inner {
-  position: relative; max-width: 1200px; margin: 0 auto;
+  max-width: 1200px; margin: 0 auto;
   padding: 120px 32px 100px;
   display: flex; flex-direction: column; align-items: center;
 }
@@ -1918,6 +1925,7 @@ html:not(.gsap-on) .nav-underline { display: none; }
 
 <!-- ══════════ 09 CLOSER ══════════ -->
 <section id="closer" class="closer" data-section>
+  <div class="closer-wash" aria-hidden="true"></div>
   <div class="closer-inner">
     <img class="closer-art" src="assets/illustrations/mover-arrived.webp"
          alt="Illustration of the mover arrived in Berlin, keys in hand, relaxed" loading="lazy" data-reveal>
@@ -2310,6 +2318,24 @@ html:not(.gsap-on) .nav-underline { display: none; }
 
       ScrollTrigger.create({ trigger: sec, start: 'top 66%', once: true, onEnter: function () { tl.play(); } });
     })();
+
+    /* ══ PHASE 3 — section transitions ══ */
+
+    /* kicker handoff: each section's kicker drifts up + dims slightly ahead of its
+       content as the section exits the top — a visible "chapter turn" rhythm */
+    document.querySelectorAll('section .kicker').forEach(function (k) {
+      var sec = k.closest('section');
+      if (!sec || sec.id === 'top' || sec.id === 'closer') return;  /* hero/closer handle their own exits */
+      gsap.to(k, { y: -40, autoAlpha: 0.2, ease: 'none',
+        scrollTrigger: { trigger: sec, start: 'top 22%', end: 'top -8%', scrub: 0.5 } });
+    });
+
+    /* closer "landing" tint — scrubbed wash deepens as the closer fills the viewport */
+    var closerWash = document.querySelector('.closer-wash');
+    if (closerWash) {
+      gsap.to(closerWash, { opacity: 1, ease: 'none',
+        scrollTrigger: { trigger: '#closer', start: 'top 92%', end: 'top 48%', scrub: 0.6 } });
+    }
 
     /* scroll progress bar */
     gsap.to('.progress', { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: 0.3 } });
