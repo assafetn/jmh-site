@@ -64,9 +64,14 @@
   /* motion */
   --ease-out:      cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring:   cubic-bezier(0.34, 1.4, 0.44, 1);
+  --ease-hero:     cubic-bezier(0.22, 1, 0.36, 1);   /* GSAP entrance physics */
+  --ease-smooth:   cubic-bezier(0.45, 0, 0.15, 1);   /* GSAP scrub / settle   */
+  --dur-micro:     200ms;
   --dur-fast:      140ms;
   --dur-base:      240ms;
-  --dur-reveal:    620ms;
+  --dur-reveal:    620ms;      /* CSS fallback reveal */
+  --dur-entrance:  750ms;      /* GSAP entrance batches */
+  --dur-scene:     1100ms;     /* scene moves: hero intro, closer exhale */
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -96,6 +101,15 @@ a { color: var(--blue); }
 .in [data-reveal="4"] { transition-delay: 280ms; }
 .in [data-reveal="5"] { transition-delay: 350ms; }
 .in [data-reveal="6"] { transition-delay: 420ms; }
+/* GSAP mode: timelines own [data-reveal] — CSS transitions/delays step aside */
+html.gsap-on [data-reveal] { transition: none; }
+
+/* ── scroll progress bar ───────────────────────────────────── */
+.progress {
+  position: fixed; top: 0; left: 0; right: 0; height: 2.5px; z-index: 200;
+  background: var(--blue); transform-origin: 0 50%; transform: scaleX(0);
+  pointer-events: none;
+}
 
 /* ── nav ───────────────────────────────────────────────────── */
 .nav {
@@ -104,6 +118,11 @@ a { color: var(--blue); }
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
+  transition: background var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
+}
+.nav.scrolled {
+  background: oklch(1 0 0 / 0.97);
+  box-shadow: 0 2px 18px oklch(0.20 0.035 245 / 0.08);
 }
 .nav-inner {
   max-width: 1200px; margin: 0 auto; padding: 13px 32px;
@@ -116,7 +135,7 @@ a { color: var(--blue); }
   color: #fff; font-size: 16px; font-weight: 700;
 }
 .nav-logo .word { font-size: 15px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
-.nav-links { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.nav-links { display: flex; align-items: center; gap: 6px; margin-left: auto; position: relative; }
 .nav-links a {
   font-size: 13px; font-weight: 600; color: var(--ink-2); text-decoration: none;
   padding: 7px 14px; border-radius: var(--r-pill);
@@ -124,6 +143,16 @@ a { color: var(--blue); }
 }
 .nav-links a:hover { color: var(--blue); }
 .nav-links a.active { color: var(--blue); background: var(--blue-05); }
+/* GSAP mode: sliding underline replaces the jumping pill */
+html.gsap-on .nav-links a.active { background: none; }
+.nav-underline {
+  position: absolute; bottom: 2px; left: 0; width: 0; height: 2px;
+  background: var(--blue); border-radius: var(--r-pill);
+  opacity: 0;
+  transition: left 380ms var(--ease-hero), width 380ms var(--ease-hero), opacity var(--dur-base) linear;
+  pointer-events: none;
+}
+html:not(.gsap-on) .nav-underline { display: none; }
 
 /* ── shared section shell ──────────────────────────────────── */
 .shell { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
@@ -808,6 +837,8 @@ a { color: var(--blue); }
 </head>
 <body>
 
+<div class="progress" aria-hidden="true"></div>
+
 <!-- ══════════ NAV ══════════ -->
 <nav class="nav">
   <div class="nav-inner">
@@ -818,6 +849,7 @@ a { color: var(--blue); }
       <a href="#problem" data-nav-to="problem">Problem</a>
       <a href="#market" data-nav-to="market">Market</a>
       <a href="#product" data-nav-to="product">Product</a>
+      <span class="nav-underline" aria-hidden="true"></span>
     </div>
   </div>
 </nav>
@@ -1905,11 +1937,18 @@ a { color: var(--blue); }
   </div>
 </section>
 
+<!-- GSAP 3.12.5 (pinned) — motion backbone; page degrades to the CSS reveal system without it -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/CustomEase.min.js"></script>
+
 <script>
 (function () {
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var gsapOn = !reduced && window.gsap && window.ScrollTrigger && window.CustomEase;
+  if (gsapOn) document.documentElement.classList.add('gsap-on');
 
-  /* ── section reveals ── */
+  /* ── section reveals (CSS fallback path; also drives .dn/.dn-x scrub targets) ── */
   var sections = document.querySelectorAll('[data-section]');
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (e) {
@@ -1918,7 +1957,58 @@ a { color: var(--blue); }
   }, { threshold: 0.18 });
   sections.forEach(function (s) { io.observe(s); });
 
-  /* ── nav active highlight ── */
+  /* ══════ GSAP GLOBAL MOTION SYSTEM ══════ */
+  if (gsapOn) {
+    gsap.registerPlugin(ScrollTrigger, CustomEase);
+    var EASE_HERO = CustomEase.create('heroEase', '0.22, 1, 0.36, 1');
+    var EASE_SMOOTH = CustomEase.create('smoothEase', '0.45, 0, 0.15, 1');
+
+    /* entrance choreography — one timeline per <section>, plays once */
+    document.querySelectorAll('section[data-section]').forEach(function (sec) {
+      var els = Array.prototype.slice.call(sec.querySelectorAll('[data-reveal]'));
+      if (!els.length) return;
+      els.sort(function (a, b) { return (+a.getAttribute('data-reveal') || 0) - (+b.getAttribute('data-reveal') || 0); });
+      var headline = sec.querySelector('h1[data-reveal], h2[data-reveal]');
+      var kicker = sec.querySelector('.kicker[data-reveal]');
+      var rest = els.filter(function (e) { return e !== headline && e !== kicker; });
+      var icons = [];
+      rest.forEach(function (el) {
+        el.querySelectorAll('.point-icon, .feature-icon, .pillar-icon').forEach(function (i) { icons.push(i); });
+      });
+
+      if (kicker) gsap.set(kicker, { autoAlpha: 0, y: 26 });
+      if (headline) gsap.set(headline, { autoAlpha: 0, y: 44, filter: 'blur(6px)' });
+      if (rest.length) gsap.set(rest, { autoAlpha: 0, y: 38 });
+      if (icons.length) gsap.set(icons, { scale: 0.88, transformOrigin: '50% 50%' });
+
+      var tl = gsap.timeline({ paused: true, defaults: { ease: EASE_HERO } });
+      if (kicker) tl.to(kicker, { autoAlpha: 1, y: 0, duration: 0.55 }, 0);
+      if (headline) tl.to(headline, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.9, clearProps: 'filter' }, 0.12);
+      if (rest.length) tl.to(rest, { autoAlpha: 1, y: 0, duration: 0.78, stagger: 0.11 }, 0.38);
+      if (icons.length) tl.to(icons, { scale: 1, duration: 0.55, ease: 'back.out(1.8)', stagger: 0.11 }, 0.44);
+
+      ScrollTrigger.create({ trigger: sec, start: 'top 72%', once: true, onEnter: function () { tl.play(); } });
+    });
+
+    /* scroll progress bar */
+    gsap.to('.progress', { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: 0.3 } });
+
+    /* nav solidify after 80px */
+    ScrollTrigger.create({ start: 80, end: 'max', toggleClass: { targets: '.nav', className: 'scrolled' } });
+  }
+
+  /* ── nav active highlight (+ sliding underline in GSAP mode) ── */
+  var underline = document.querySelector('.nav-underline');
+  var activeLink = null;
+  function setUnderline(link) {
+    if (!underline || !gsapOn || !link) return;
+    var parent = underline.parentElement.getBoundingClientRect();
+    var r = link.getBoundingClientRect();
+    underline.style.left = (r.left - parent.left) + 'px';
+    underline.style.width = r.width + 'px';
+    underline.style.opacity = '1';
+  }
+  window.addEventListener('resize', function () { setUnderline(activeLink); });
   var navLinks = document.querySelectorAll('[data-nav-to]');
   if (navLinks.length) {
     var navIo = new IntersectionObserver(function (entries) {
@@ -1927,6 +2017,8 @@ a { color: var(--blue); }
         if (link && e.isIntersecting) {
           navLinks.forEach(function (l) { l.classList.remove('active'); });
           link.classList.add('active');
+          activeLink = link;
+          setUnderline(link);
         }
       });
     }, { rootMargin: '-40% 0px -55% 0px' });
