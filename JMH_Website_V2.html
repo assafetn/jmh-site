@@ -444,11 +444,14 @@ html:not(.gsap-on) .nav-underline { display: none; }
 .product-art { max-width: 860px; margin: 0 auto 56px; }
 .product-art img { mix-blend-mode: multiply; }
 
-.pillars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+/* subgrid shares row tracks across the pillars so head / body / info all
+   line up — the info highlight cards end up equal height (tallest wins) */
+.pillars { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: auto 1fr auto; gap: 18px; }
 .pillar {
   background: var(--bg); border: 1px solid var(--border);
   border-radius: var(--r-card); box-shadow: var(--shadow-card);
-  padding: 26px 22px; display: flex; flex-direction: column; gap: 13px;
+  padding: 26px 22px; gap: 13px;
+  display: grid; grid-row: span 3; grid-template-rows: subgrid;
   transition: box-shadow var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
 }
 .pillar:hover { box-shadow: var(--shadow-lift); transform: translateY(-3px); }
@@ -460,7 +463,7 @@ html:not(.gsap-on) .nav-underline { display: none; }
 }
 .pillar-num { display: block; font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--blue); margin-bottom: 2px; }
 .pillar-name { display: block; font-size: 16px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); }
-.pillar p { font-size: 13px; line-height: 1.6; color: var(--ink-2); flex: 1; margin: 0; }
+.pillar p { font-size: 13px; line-height: 1.6; color: var(--ink-2); margin: 0; align-self: start; }
 .pillar-info { padding: 11px 13px; background: var(--blue-05); border: 1px solid var(--blue-10); border-radius: 10px; }
 .pillar-info.sage { background: var(--sage-bg); border-color: oklch(0.60 0.09 148 / 0.25); }
 .pillar-info.gold { background: var(--gold-bg); border-color: oklch(0.72 0.10 88 / 0.30); }
@@ -816,7 +819,7 @@ html:not(.gsap-on) .nav-underline { display: none; }
   .era-link { padding: 14px 0; }
   .era-link svg { transform: rotate(90deg); }
   .market-points { grid-template-columns: 1fr; gap: 22px; }
-  .pillars { grid-template-columns: 1fr; }
+  .pillars { grid-template-columns: 1fr; grid-template-rows: repeat(4, auto auto auto); }
   .psec-grid, .psec.flip .psec-grid { grid-template-columns: 1fr; gap: 44px; }
   .psec.flip .psec-copy { order: 1; }
   .psec.flip .psec-stage { order: 2; }
@@ -827,7 +830,7 @@ html:not(.gsap-on) .nav-underline { display: none; }
   }
 }
 @media (min-width: 921px) and (max-width: 1120px) {
-  .pillars { grid-template-columns: 1fr 1fr; }
+  .pillars { grid-template-columns: 1fr 1fr; grid-template-rows: repeat(2, auto 1fr auto); }
 }
 @media (max-width: 420px) {
   .hero-grid { padding-left: 20px; padding-right: 20px; }
@@ -2192,26 +2195,18 @@ html:not(.gsap-on) .nav-underline { display: none; }
           scrollTrigger: { trigger: art, start: 'top bottom', end: 'bottom top', scrub: 0.5 } });
       }
 
-      /* pillars: stage each card + prep its icon shapes for a stroke draw */
-      function iconShapes(p) { return p.querySelectorAll('.pillar-icon path, .pillar-icon circle, .pillar-icon rect'); }
-      pillars.forEach(function (p, i) {
-        gsap.set(p, { autoAlpha: 0, y: 46, rotation: (i % 2 === 0 ? -1.2 : 1.2), scale: 0.96, transformOrigin: '50% 100%' });
-        iconShapes(p).forEach(function (s) {
-          var len = s.getTotalLength ? s.getTotalLength() : 32;
-          gsap.set(s, { strokeDasharray: len, strokeDashoffset: len, fillOpacity: 0 });
-        });
-      });
+      /* pillars: one-pass staggered rise, each icon popping 80ms into its card's arrival
+         (whole grid assembles in ~0.9s; no pin, no scrub) */
+      var icons = pillars.map(function (p) { return p.querySelector('.pillar-icon'); });
+      gsap.set(pillars, { autoAlpha: 0, y: 36 });
+      gsap.set(icons, { scale: 0.8, transformOrigin: '50% 50%' });
 
       ScrollTrigger.create({
-        trigger: '.pillars', start: 'top 80%', once: true,
+        trigger: '.pillars', start: 'top 78%', once: true,
         onEnter: function () {
-          pillars.forEach(function (p, i) {
-            var shapes = iconShapes(p);
-            var tl = gsap.timeline({ delay: i * 0.12 });
-            tl.to(p, { autoAlpha: 1, y: 0, rotation: 0, scale: 1, duration: 0.7, ease: 'back.out(1.3)', clearProps: 'transform' }, 0)
-              .to(shapes, { strokeDashoffset: 0, duration: 0.5, ease: 'none', stagger: 0.05 }, 0.16)
-              .to(shapes, { fillOpacity: 1, duration: 0.4, clearProps: 'strokeDasharray,strokeDashoffset,fillOpacity' }, 0.32);
-          });
+          var tl = gsap.timeline();
+          tl.to(pillars, { autoAlpha: 1, y: 0, duration: 0.55, stagger: 0.11, ease: EASE_HERO, clearProps: 'transform' }, 0)
+            .to(icons, { scale: 1, duration: 0.4, stagger: 0.11, ease: 'back.out(1.9)' }, 0.08);
         }
       });
     })();
