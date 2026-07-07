@@ -105,6 +105,7 @@ a { color: var(--blue); }
 html.gsap-on [data-reveal] { transition: none; }
 /* GSAP mode: diagram nodes are scrubbed frame-accurately, not CSS-eased */
 html.gsap-on .dn, html.gsap-on .dn-line { transition: none; }
+html.gsap-on .dn-x, html.gsap-on .era-item, html.gsap-on .era-foot { transition: none; }
 
 /* ── scroll progress bar ───────────────────────────────────── */
 .progress {
@@ -2115,6 +2116,81 @@ html:not(.gsap-on) .nav-underline { display: none; }
       });
     })();
 
+    /* ══ 03 MARKET — three-era timeline, scrubbed through history ══ */
+    (function () {
+      var eras = document.querySelector('.eras');
+      if (!eras) return;
+      var era1 = eras.children[0], link1 = eras.children[1],
+          era2 = eras.children[2], link2 = eras.children[3], era3 = eras.children[4];
+      var items = function (era) { return era.querySelectorAll('.era-item'); };
+      var foot = function (era) { return era.querySelector('.era-foot'); };
+      var arrowPath = function (link) { return link.querySelector('svg path'); };
+
+      function drawSetup(p) {   /* prep an arrow path for dashoffset draw */
+        var len = p.getTotalLength ? p.getTotalLength() : 40;
+        gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
+        return len;
+      }
+
+      var mm = gsap.matchMedia();
+
+      /* wide desktop only: pinned scrub through the three eras
+         (eras reflow to a single vertical column at <=920px — no horizontal pin there) */
+      mm.add('(min-width: 921px)', function () {
+        gsap.set([era1, era2, era3], { autoAlpha: 0, x: -44, scale: 0.95, transformOrigin: '50% 50%' });
+        gsap.set([link1, link2], { autoAlpha: 0 });
+        [era1, era2, era3].forEach(function (e) { gsap.set(items(e), { autoAlpha: 0, x: -12 }); gsap.set(foot(e), { autoAlpha: 0 }); });
+        drawSetup(arrowPath(link1)); drawSetup(arrowPath(link2));
+
+        var tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: eras, start: 'center 62%',
+            end: function () { return '+=' + Math.round(window.innerHeight * 2); },
+            pin: true, scrub: 0.5, anticipatePin: 1, invalidateOnRefresh: true
+          }
+        });
+        /* Era 1 lands + checklist cascades */
+        tl.to(era1, { autoAlpha: 1, x: 0, scale: 1, duration: 0.12, ease: EASE_HERO }, 0.02)
+          .to(items(era1), { autoAlpha: 1, x: 0, duration: 0.08, stagger: 0.018 }, 0.10)
+          .to(foot(era1), { autoAlpha: 1, duration: 0.05 }, 0.20);
+        /* "The shift" connector draws */
+        tl.to(link1, { autoAlpha: 1, duration: 0.04 }, 0.24)
+          .to(arrowPath(link1), { strokeDashoffset: 0, duration: 0.08, ease: 'none' }, 0.24);
+        /* Era 2 lands as Era 1 recedes into the past */
+        tl.to(era1, { scale: 0.93, autoAlpha: 0.5, duration: 0.14, ease: 'none' }, 0.30)
+          .to(era2, { autoAlpha: 1, x: 0, scale: 1, duration: 0.12, ease: EASE_HERO }, 0.32)
+          .to(items(era2), { autoAlpha: 1, x: 0, duration: 0.08, stagger: 0.018 }, 0.40)
+          .to(foot(era2), { autoAlpha: 1, duration: 0.05 }, 0.50);
+        /* "JMH fills" connector draws */
+        tl.to(link2, { autoAlpha: 1, duration: 0.04 }, 0.54)
+          .to(arrowPath(link2), { strokeDashoffset: 0, duration: 0.08, ease: 'none' }, 0.54);
+        /* Era 3 (JMH) — the strongest landing + border glow, Era 2 recedes */
+        tl.to(era2, { scale: 0.93, autoAlpha: 0.5, duration: 0.14, ease: 'none' }, 0.60)
+          .fromTo(era3, { autoAlpha: 0, x: -44, scale: 0.88 },
+                        { autoAlpha: 1, x: 0, scale: 1, duration: 0.18, ease: 'back.out(1.7)' }, 0.62)
+          .to(era3, { boxShadow: '0 0 0 2px oklch(0.64 0.17 248 / 0.45), 0 14px 44px oklch(0.54 0.14 240 / 0.34)', duration: 0.12, ease: EASE_HERO }, 0.72)
+          .to(items(era3), { autoAlpha: 1, x: 0, duration: 0.08, stagger: 0.018 }, 0.74)
+          .to(foot(era3), { autoAlpha: 1, duration: 0.05 }, 0.86)
+          /* settle the glow to a calm resting elevation */
+          .to(era3, { boxShadow: '0 0 0 1px oklch(0.64 0.17 248 / 0.22), 0 6px 26px oklch(0.54 0.14 240 / 0.16)', duration: 0.12, ease: EASE_HERO }, 0.90);
+
+        return function () { gsap.set([era1, era2, era3], { clearProps: 'boxShadow' }); };
+      });
+
+      /* stacked layout (<=920px): no pin — one-shot staggered entrance */
+      mm.add('(max-width: 920px)', function () {
+        var cells = [era1, link1, era2, link2, era3];
+        gsap.set(cells, { autoAlpha: 0, y: 22 });
+        [era1, era2, era3].forEach(function (e) { gsap.set(items(e), { autoAlpha: 0, x: -10 }); });
+        var tl = gsap.timeline({ paused: true, defaults: { ease: EASE_HERO } });
+        cells.forEach(function (c, i) {
+          tl.to(c, { autoAlpha: 1, y: 0, duration: 0.5 }, i * 0.14);
+          if (c.querySelector && c.querySelector('.era-item')) tl.to(c.querySelectorAll('.era-item'), { autoAlpha: 1, x: 0, duration: 0.35, stagger: 0.04 }, i * 0.14 + 0.15);
+        });
+        ScrollTrigger.create({ trigger: eras, start: 'top 80%', once: true, onEnter: function () { tl.play(); } });
+      });
+    })();
+
     /* scroll progress bar */
     gsap.to('.progress', { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: 0.3 } });
 
@@ -2162,6 +2238,9 @@ html:not(.gsap-on) .nav-underline { display: none; }
         cIo.unobserve(e.target);
         var el = e.target, target = parseFloat(el.getAttribute('data-count'));
         var dec = parseInt(el.getAttribute('data-decimals') || '0', 10);
+        /* scale-settle on the stat-card number as its counter fires */
+        var statNum = el.closest('.stat-num');
+        if (gsapOn && statNum) gsap.fromTo(statNum, { scale: 0.9 }, { scale: 1, duration: 0.6, ease: 'back.out(2)', transformOrigin: 'left center' });
         if (reduced) { el.textContent = target.toFixed(dec); return; }
         var t0 = null, dur = 1200;
         function tick(t) {
