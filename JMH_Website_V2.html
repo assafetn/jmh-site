@@ -39,6 +39,9 @@
   --gold-bg:       oklch(0.97 0.020 88);
   --coral:         oklch(0.60 0.15 22);
   --coral-bg:      oklch(0.97 0.022 22);
+  /* kicker contrast (context-aware; both pass WCAG AA against their backgrounds) */
+  --kicker-on-light: oklch(0.42 0.15 250);   /* deep ink-blue: 7.4–8.3:1 on bg/tint/surface */
+  --kicker-on-dark:  oklch(0.86 0.06 240);   /* light blue tint: 13:1 on --dark            */
   /* illustration shading */
   --shade-1:       oklch(0.905 0.014 245);
   --shade-2:       oklch(0.845 0.018 245);
@@ -161,7 +164,7 @@ html:not(.gsap-on) .nav-underline { display: none; }
 .shell { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
 .kicker {
   font-size: var(--label); font-weight: 600; letter-spacing: 0.12em;
-  text-transform: uppercase; color: var(--blue);
+  text-transform: uppercase; color: var(--kicker-on-light);
 }
 
 /* ── hero ──────────────────────────────────────────────────── */
@@ -321,7 +324,7 @@ html:not(.gsap-on) .nav-underline { display: none; }
   gap: 56px; align-items: center;
   margin-bottom: 84px;
 }
-.problem .kicker { color: var(--blue-bright); }
+.problem .kicker { color: var(--kicker-on-dark); }
 .problem h2 {
   font-size: var(--h2); font-weight: 700; letter-spacing: -0.02em;
   line-height: 1.08; margin: 18px 0 40px; max-width: 480px;
@@ -2327,7 +2330,7 @@ html:not(.gsap-on) .nav-underline { display: none; }
     document.querySelectorAll('section .kicker').forEach(function (k) {
       var sec = k.closest('section');
       if (!sec || sec.id === 'top' || sec.id === 'closer') return;  /* hero/closer handle their own exits */
-      gsap.to(k, { y: -40, autoAlpha: 0.2, ease: 'none',
+      gsap.to(k, { y: -40, autoAlpha: 0.7, ease: 'none',   /* dim floor reached only once kicker is above the viewport; stays AA while visible */
         scrollTrigger: { trigger: sec, start: 'top 22%', end: 'top -8%', scrub: 0.5 } });
     });
 
