@@ -1963,8 +1963,10 @@ html:not(.gsap-on) .nav-underline { display: none; }
     var EASE_HERO = CustomEase.create('heroEase', '0.22, 1, 0.36, 1');
     var EASE_SMOOTH = CustomEase.create('smoothEase', '0.45, 0, 0.15, 1');
 
-    /* entrance choreography — one timeline per <section>, plays once */
+    /* entrance choreography — one timeline per <section>, plays once
+       (hero excluded: it gets its own load timeline below) */
     document.querySelectorAll('section[data-section]').forEach(function (sec) {
+      if (sec.id === 'top') return;
       var els = Array.prototype.slice.call(sec.querySelectorAll('[data-reveal]'));
       if (!els.length) return;
       els.sort(function (a, b) { return (+a.getAttribute('data-reveal') || 0) - (+b.getAttribute('data-reveal') || 0); });
@@ -1989,6 +1991,55 @@ html:not(.gsap-on) .nav-underline { display: none; }
 
       ScrollTrigger.create({ trigger: sec, start: 'top 72%', once: true, onEnter: function () { tl.play(); } });
     });
+
+    /* ══ 01 HERO — "the page wakes up" ══ */
+    (function () {
+      var hero = document.getElementById('top');
+      var kicker = hero.querySelector('.kicker');
+      var h1 = hero.querySelector('h1');
+      var points = hero.querySelectorAll('.hero-points .point');
+      var icons = hero.querySelectorAll('.point-icon');
+      var phone = hero.querySelector('.phone');
+      var mover = hero.querySelector('.hero-mover');
+      var stage = hero.querySelector('.hero-stage');
+      var grid = hero.querySelector('.hero-grid');
+
+      /* split headline into word spans (copy untouched; a11y label preserved) */
+      h1.setAttribute('aria-label', h1.textContent);
+      h1.innerHTML = h1.textContent.split(' ').map(function (w) {
+        return '<span class="hw" aria-hidden="true" style="display:inline-block;">' + w + '</span>';
+      }).join(' ');
+      var words = h1.querySelectorAll('.hw');
+
+      /* stage the scene */
+      gsap.set(h1, { autoAlpha: 1, y: 0 });          /* container visible; words animate */
+      gsap.set(words, { autoAlpha: 0, y: 46 });
+      gsap.set(kicker, { autoAlpha: 0, y: 26 });
+      gsap.set(points, { autoAlpha: 0, y: 38 });
+      gsap.set(icons, { scale: 0.88, transformOrigin: '50% 50%' });
+      gsap.set(phone, { autoAlpha: 0, y: 96, rotation: -2.4, transformOrigin: '50% 80%' });
+      gsap.set(mover, { autoAlpha: 0, y: -26, animation: 'none' }); /* pause float during intro */
+
+      var heroTl = gsap.timeline({ delay: 0.15, defaults: { ease: EASE_HERO } });
+      heroTl
+        .to(kicker, { autoAlpha: 1, y: 0, duration: 0.55 }, 0)
+        .to(words, { autoAlpha: 1, y: 0, duration: 0.85, stagger: 0.085 }, 0.14)
+        .to(points, { autoAlpha: 1, y: 0, duration: 0.75, stagger: 0.13 }, 0.62)
+        .to(icons, { scale: 1, duration: 0.55, ease: 'back.out(1.8)', stagger: 0.13 }, 0.68)
+        .to(phone, { autoAlpha: 1, y: 0, rotation: 0, duration: 1.1, ease: 'back.out(1.15)' }, 0.55)
+        .to(mover, { autoAlpha: 1, y: 0, duration: 0.9, clearProps: 'animation,y',
+             onComplete: function () { gsap.set(mover, { clearProps: 'transform' }); } }, 0.85);
+
+      /* depth parallax: stage (Mover's depth) lags more than the phone */
+      gsap.to(stage, { y: 84, ease: 'none',
+        scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.4 } });
+      gsap.to(phone, { yPercent: -6, ease: 'none',   /* separate channel from the intro's y */
+        scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.4 } });
+
+      /* scrubbed exit: content settles back and dims as 02 takes over */
+      gsap.to(grid, { scale: 0.97, autoAlpha: 0.3, transformOrigin: '50% 65%', ease: 'none',
+        scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom 35%', scrub: 0.4 } });
+    })();
 
     /* scroll progress bar */
     gsap.to('.progress', { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: 0.3 } });
