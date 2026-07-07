@@ -169,15 +169,16 @@ html:not(.gsap-on) .nav-underline { display: none; }
   position: relative; overflow: hidden;
   min-height: 100vh;
   background: radial-gradient(ellipse 100% 55% at 50% 0%, var(--blue-10) 0%, var(--bg) 70%);
-  display: flex; align-items: flex-end;
+  display: flex; align-items: center;              /* vertical centre under the fixed nav */
+  padding: 40px 0 28px;                             /* top clears the nav; content centres in the rest */
 }
 .hero-grid {
   position: relative; width: 100%;
-  max-width: 1200px; margin: 0 auto; padding: 150px 32px 0;
+  max-width: 1200px; margin: 0 auto; padding: 0 32px;
   display: grid; grid-template-columns: 1.02fr 0.98fr; gap: 32px;
-  align-items: end;
+  align-items: center;
 }
-.hero-copy { padding-bottom: 96px; }
+.hero-copy { padding-bottom: 0; }
 .hero-copy .kicker { margin-bottom: 22px; display: block; }
 .hero h1 {
   font-size: var(--display); font-weight: 700;
@@ -197,8 +198,7 @@ html:not(.gsap-on) .nav-underline { display: none; }
 /* hero stage: illustration + phone */
 .hero-stage {
   position: relative;
-  display: flex; justify-content: flex-end; align-items: flex-end;
-  min-height: 560px;
+  display: flex; justify-content: flex-end; align-items: center;
 }
 .hero-mover {
   position: absolute; left: -34px; bottom: 0;
@@ -223,7 +223,7 @@ html:not(.gsap-on) .nav-underline { display: none; }
 }
 /* deepens while a phone's micro-interaction plays */
 .phone.micro-active { box-shadow: 0 34px 90px oklch(0.54 0.14 240 / 0.26), 0 12px 30px oklch(0.20 0.035 245 / 0.13); }
-.hero .phone { margin-bottom: -96px; }   /* hero only: bleeds off the fold */
+.hero .phone { margin-bottom: 0; }   /* fully visible, centred */
 /* iOS chrome: status bar + dynamic island */
 .phone-top {
   position: relative; height: 42px; flex-shrink: 0;
@@ -794,13 +794,14 @@ html:not(.gsap-on) .nav-underline { display: none; }
 
 /* ── responsive ────────────────────────────────────────────── */
 @media (max-width: 920px) {
-  .hero-grid { grid-template-columns: 1fr; padding-top: 120px; }
+  .hero { padding: 96px 0 40px; align-items: flex-start; }
+  .hero-grid { grid-template-columns: 1fr; padding: 0 32px; }
   .hero-copy { padding-bottom: 24px; }
   .hero h1 { margin-bottom: 34px; }
   .hero-stage { justify-content: center; min-height: 0; margin-top: 12px; }
   .hero-mover { position: static; width: 190px; margin: 0 auto -20px; order: -1; }
   .hero-stage { flex-direction: column; align-items: center; }
-  .hero .phone { margin-bottom: -140px; }
+  .hero .phone { margin-bottom: 0; }
   .nav-links a:not(:last-child) { display: none; }
 }
 @media (max-width: 920px) {
