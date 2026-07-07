@@ -311,7 +311,7 @@ html:not(.gsap-on) .nav-underline { display: none; }
 .problem {
   background: var(--dark);
   color: var(--ink-on-dark);
-  padding: 130px 0 110px;
+  padding: 90px 0 80px;
   position: relative; overflow: hidden;
 }
 .problem::before {            /* sanctioned dark-band wash */
@@ -322,7 +322,7 @@ html:not(.gsap-on) .nav-underline { display: none; }
   position: relative;
   display: grid; grid-template-columns: 1.1fr 0.9fr;
   gap: 56px; align-items: center;
-  margin-bottom: 84px;
+  margin-bottom: 44px;
 }
 .problem .kicker { color: var(--kicker-on-dark); }
 .problem h2 {
@@ -344,7 +344,7 @@ html:not(.gsap-on) .nav-underline { display: none; }
 .prob-art img { width: 100%; }
 
 /* diagram: node-by-node draw-in */
-.prob-diagram { position: relative; }
+.prob-diagram { position: relative; max-width: 1000px; margin: 0 auto; }   /* ~12% shorter than full-width */
 .prob-diagram svg { width: 100%; height: auto; display: block; overflow: visible; }
 .dn {
   opacity: 0;
@@ -2065,7 +2065,7 @@ html:not(.gsap-on) .nav-underline { display: none; }
         scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom 35%', scrub: 0.4 } });
     })();
 
-    /* ══ 02 PROBLEM — chaos→JMH diagram, scroll-scrubbed ══ */
+    /* ══ 02 PROBLEM — chaos→JMH diagram, fast one-shot assembly (no pin) ══ */
     (function () {
       var diagram = document.querySelector('.prob-diagram');
       if (!diagram) return;
@@ -2078,63 +2078,34 @@ html:not(.gsap-on) .nav-underline { display: none; }
       var converging = dnLine[0], arrowG = dnLine[1], branchG = dnLine[2], footerG = dnLine[3];
       var convLines = Array.prototype.slice.call(converging.querySelectorAll('line'));
       var arrowLine = arrowG.querySelector('line');
-
-      /* capture connector end-points so we can draw them from their source */
       var convTargets = convLines.map(function (l) {
         return { x1: l.getAttribute('x1'), y1: l.getAttribute('y1'), x2: l.getAttribute('x2'), y2: l.getAttribute('y2') };
       });
       var arrowTarget = { x1: arrowLine.getAttribute('x1'), x2: arrowLine.getAttribute('x2') };
-
       function rotOf(el) { return parseFloat(getComputedStyle(el).getPropertyValue('--r')) || 0; }
 
-      var mm = gsap.matchMedia();
+      /* stage: sources scattered, nodes shrunk, connectors collapsed to their origin */
+      sources.forEach(function (g) { gsap.set(g, { autoAlpha: 0, y: 26, scale: 0.85, rotation: rotOf(g) * 2.5, transformOrigin: '50% 50%' }); });
+      gsap.set([youNode, jmhNode].concat(outcomes), { autoAlpha: 0, scale: 0.78, transformOrigin: '50% 50%' });
+      gsap.set([converging, arrowG], { autoAlpha: 1 });
+      gsap.set([branchG, footerG], { autoAlpha: 0 });
+      convLines.forEach(function (l, i) { l.setAttribute('x2', convTargets[i].x1); l.setAttribute('y2', convTargets[i].y1); });
+      arrowLine.setAttribute('x2', arrowTarget.x1);
 
-      /* desktop / tablet: pinned scrub */
-      mm.add('(min-width: 769px)', function () {
-        /* stage: sources scattered, nodes shrunk, connectors collapsed to their origin */
-        sources.forEach(function (g) { gsap.set(g, { autoAlpha: 0, y: 26, scale: 0.85, rotation: rotOf(g) * 2.5, transformOrigin: '50% 50%' }); });
-        gsap.set([youNode, jmhNode].concat(outcomes), { autoAlpha: 0, scale: 0.78, transformOrigin: '50% 50%' });
-        gsap.set([converging, arrowG], { autoAlpha: 1 });
-        gsap.set([branchG, footerG], { autoAlpha: 0 });
-        convLines.forEach(function (l) { l.setAttribute('x2', convTargets[convLines.indexOf(l)].x1); l.setAttribute('y2', convTargets[convLines.indexOf(l)].y1); });
-        arrowLine.setAttribute('x2', arrowTarget.x1);
-
-        var tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: diagram, start: 'top 22%',
-            end: function () { return '+=' + Math.round(window.innerHeight * 1.5); },
-            pin: true, scrub: 0.5, anticipatePin: 1, invalidateOnRefresh: true
-          }
-        });
-        tl.to(sources, { autoAlpha: 1, y: 0, scale: 1, rotation: 0, duration: 0.30, stagger: 0.045, ease: EASE_HERO }, 0);
-        convLines.forEach(function (l, i) {
-          tl.to(l, { attr: { x2: convTargets[i].x2, y2: convTargets[i].y2 }, duration: 0.16, ease: 'none' }, 0.28 + i * 0.015);
-        });
-        tl.to(youNode, { autoAlpha: 1, scale: 1, duration: 0.12, ease: 'back.out(2.2)' }, 0.48);
-        tl.to(arrowLine, { attr: { x2: arrowTarget.x2 }, duration: 0.10, ease: 'none' }, 0.56);
-        tl.to(jmhNode, { autoAlpha: 1, scale: 1, duration: 0.16, ease: 'back.out(1.6)' }, 0.62);
-        tl.to(branchG, { autoAlpha: 1, duration: 0.10 }, 0.70);
-        tl.to(outcomes, { autoAlpha: 1, scale: 1, duration: 0.14, stagger: 0.07, ease: 'back.out(1.5)' }, 0.74);
-        tl.to(footerG, { autoAlpha: 1, duration: 0.08 }, 0.94);
-
-        return function () {   /* cleanup on breakpoint change: restore SVG attrs */
-          convLines.forEach(function (l, i) { l.setAttribute('x2', convTargets[i].x2); l.setAttribute('y2', convTargets[i].y2); });
-          arrowLine.setAttribute('x2', arrowTarget.x2);
-        };
+      /* fast time-based build (~2.1s total), plays once and stays assembled */
+      var tl = gsap.timeline({ paused: true });
+      tl.to(sources, { autoAlpha: 1, y: 0, scale: 1, rotation: 0, duration: 0.5, stagger: 0.05, ease: EASE_HERO }, 0);
+      convLines.forEach(function (l, i) {
+        tl.to(l, { attr: { x2: convTargets[i].x2, y2: convTargets[i].y2 }, duration: 0.18, ease: 'power1.out' }, 0.5 + i * 0.02);
       });
+      tl.to(youNode, { autoAlpha: 1, scale: 1, duration: 0.28, ease: 'back.out(2.2)' }, 0.8)
+        .to(arrowLine, { attr: { x2: arrowTarget.x2 }, duration: 0.16, ease: 'power1.out' }, 0.98)
+        .to(jmhNode, { autoAlpha: 1, scale: 1, duration: 0.32, ease: 'back.out(1.6)' }, 1.1)
+        .to(branchG, { autoAlpha: 1, duration: 0.2 }, 1.36)
+        .to(outcomes, { autoAlpha: 1, scale: 1, duration: 0.32, stagger: 0.09, ease: 'back.out(1.5)' }, 1.46)
+        .to(footerG, { autoAlpha: 1, duration: 0.28 }, 1.9);
 
-      /* mobile: no pin — one-shot staggered entrance, lines appear full-length */
-      mm.add('(max-width: 768px)', function () {
-        var all = Array.prototype.slice.call(dn).concat(Array.prototype.slice.call(dnLine));
-        gsap.set(all, { autoAlpha: 0, y: 14 });
-        var tl = gsap.timeline({ paused: true, defaults: { ease: EASE_HERO } });
-        tl.to(sources, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.06 }, 0)
-          .to([converging], { autoAlpha: 1, y: 0, duration: 0.4 }, 0.3)
-          .to([youNode, arrowG, jmhNode], { autoAlpha: 1, y: 0, duration: 0.45, stagger: 0.1 }, 0.42)
-          .to([branchG].concat(outcomes), { autoAlpha: 1, y: 0, duration: 0.45, stagger: 0.09 }, 0.7)
-          .to(footerG, { autoAlpha: 1, y: 0, duration: 0.35 }, 1.0);
-        ScrollTrigger.create({ trigger: diagram, start: 'top 78%', once: true, onEnter: function () { tl.play(); } });
-      });
+      ScrollTrigger.create({ trigger: diagram, start: 'top 75%', once: true, onEnter: function () { tl.play(); } });
     })();
 
     /* ══ 03 MARKET — three-era timeline, scrubbed through history ══ */
