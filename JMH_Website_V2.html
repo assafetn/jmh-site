@@ -1975,7 +1975,11 @@ html:not(.gsap-on) .nav-underline { display: none; }
       els.sort(function (a, b) { return (+a.getAttribute('data-reveal') || 0) - (+b.getAttribute('data-reveal') || 0); });
       var headline = sec.querySelector('h1[data-reveal], h2[data-reveal]');
       var kicker = sec.querySelector('.kicker[data-reveal]');
-      var rest = els.filter(function (e) { return e !== headline && e !== kicker; });
+      var rest = els.filter(function (e) {
+        return e !== headline && e !== kicker
+          && !e.classList.contains('product-art')   /* owned by the product module */
+          && !e.closest('.pillars');                 /* pillars get bespoke land + icon draw */
+      });
       var icons = [];
       rest.forEach(function (el) {
         el.querySelectorAll('.point-icon, .feature-icon, .pillar-icon').forEach(function (i) { icons.push(i); });
@@ -2188,6 +2192,46 @@ html:not(.gsap-on) .nav-underline { display: none; }
           if (c.querySelector && c.querySelector('.era-item')) tl.to(c.querySelectorAll('.era-item'), { autoAlpha: 1, x: 0, duration: 0.35, stagger: 0.04 }, i * 0.14 + 0.15);
         });
         ScrollTrigger.create({ trigger: eras, start: 'top 80%', once: true, onEnter: function () { tl.play(); } });
+      });
+    })();
+
+    /* ══ 04 PRODUCT — path parallax + pillar land with icon stroke-draw ══ */
+    (function () {
+      var section = document.getElementById('product');
+      if (!section) return;
+      var art = section.querySelector('.product-art');
+      var pillars = Array.prototype.slice.call(section.querySelectorAll('.pillar'));
+
+      /* path illustration: reveal, then a slow parallax drift while in view */
+      if (art) {
+        gsap.set(art, { autoAlpha: 0, y: 40 });
+        ScrollTrigger.create({ trigger: art, start: 'top 84%', once: true,
+          onEnter: function () { gsap.to(art, { autoAlpha: 1, y: 0, duration: 0.85, ease: EASE_HERO }); } });
+        gsap.to(art.querySelector('img'), { yPercent: -6, ease: 'none',
+          scrollTrigger: { trigger: art, start: 'top bottom', end: 'bottom top', scrub: 0.5 } });
+      }
+
+      /* pillars: stage each card + prep its icon shapes for a stroke draw */
+      function iconShapes(p) { return p.querySelectorAll('.pillar-icon path, .pillar-icon circle, .pillar-icon rect'); }
+      pillars.forEach(function (p, i) {
+        gsap.set(p, { autoAlpha: 0, y: 46, rotation: (i % 2 === 0 ? -1.2 : 1.2), scale: 0.96, transformOrigin: '50% 100%' });
+        iconShapes(p).forEach(function (s) {
+          var len = s.getTotalLength ? s.getTotalLength() : 32;
+          gsap.set(s, { strokeDasharray: len, strokeDashoffset: len, fillOpacity: 0 });
+        });
+      });
+
+      ScrollTrigger.create({
+        trigger: '.pillars', start: 'top 80%', once: true,
+        onEnter: function () {
+          pillars.forEach(function (p, i) {
+            var shapes = iconShapes(p);
+            var tl = gsap.timeline({ delay: i * 0.12 });
+            tl.to(p, { autoAlpha: 1, y: 0, rotation: 0, scale: 1, duration: 0.7, ease: 'back.out(1.3)', clearProps: 'transform' }, 0)
+              .to(shapes, { strokeDashoffset: 0, duration: 0.5, ease: 'none', stagger: 0.05 }, 0.16)
+              .to(shapes, { fillOpacity: 1, duration: 0.4, clearProps: 'strokeDasharray,strokeDashoffset,fillOpacity' }, 0.32);
+          });
+        }
       });
     })();
 
