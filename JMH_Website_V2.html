@@ -219,7 +219,10 @@ html:not(.gsap-on) .nav-underline { display: none; }
   border-radius: 46px; background: var(--bg); border: 11px solid var(--dark);
   box-shadow: var(--shadow-phone);
   overflow: hidden; display: flex; flex-direction: column;
+  transition: box-shadow 550ms var(--ease-out);
 }
+/* deepens while a phone's micro-interaction plays */
+.phone.micro-active { box-shadow: 0 34px 90px oklch(0.54 0.14 240 / 0.26), 0 12px 30px oklch(0.20 0.035 245 / 0.13); }
 .hero .phone { margin-bottom: -96px; }   /* hero only: bleeds off the fold */
 /* iOS chrome: status bar + dynamic island */
 .phone-top {
@@ -1970,6 +1973,7 @@ html:not(.gsap-on) .nav-underline { display: none; }
        (hero excluded: it gets its own load timeline below) */
     document.querySelectorAll('section[data-section]').forEach(function (sec) {
       if (sec.id === 'top') return;
+      if (sec.classList.contains('psec')) return;   /* pillars 05–08 own their directional entrance */
       var els = Array.prototype.slice.call(sec.querySelectorAll('[data-reveal]'));
       if (!els.length) return;
       els.sort(function (a, b) { return (+a.getAttribute('data-reveal') || 0) - (+b.getAttribute('data-reveal') || 0); });
@@ -2235,6 +2239,48 @@ html:not(.gsap-on) .nav-underline { display: none; }
       });
     })();
 
+    /* ══ 05–08 PILLARS — directional entrance, feature icon-before-text, spot parallax ══ */
+    document.querySelectorAll('section.psec').forEach(function (sec) {
+      var flip = sec.classList.contains('flip');
+      var copyX = flip ? 46 : -46;      /* copy enters from its own outer edge */
+      var phoneX = flip ? -46 : 46;     /* phone enters from the opposite edge */
+      var copy = sec.querySelector('.psec-copy');
+      var kicker = copy.querySelector('.kicker');
+      var h2 = copy.querySelector('h2');
+      var lead = copy.querySelector('.lead');
+      var features = Array.prototype.slice.call(copy.querySelectorAll('.feature'));
+      var phone = sec.querySelector('.phone');
+      var spot = sec.querySelector('.psec-spot');
+
+      /* stage (y:0 explicitly overrides the CSS [data-reveal] translateY(24px) base) */
+      gsap.set([kicker, h2, lead], { autoAlpha: 0, x: copyX, y: 0 });
+      features.forEach(function (f) {
+        var ic = f.querySelector('.feature-icon');
+        gsap.set(ic, { autoAlpha: 0, scale: 0.7, transformOrigin: '50% 50%' });
+        gsap.set(ic.nextElementSibling, { autoAlpha: 0, x: copyX * 0.35 });
+      });
+      if (phone) gsap.set(phone, { autoAlpha: 0, x: phoneX, y: 22 });
+      if (spot) gsap.set(spot, { autoAlpha: 0, y: 0 });
+
+      var tl = gsap.timeline({ paused: true, defaults: { ease: EASE_HERO } });
+      tl.to(kicker, { autoAlpha: 1, x: 0, duration: 0.6 }, 0)
+        .to(h2, { autoAlpha: 1, x: 0, duration: 0.75 }, 0.1)
+        .to(lead, { autoAlpha: 1, x: 0, duration: 0.7 }, 0.24);
+      if (phone) tl.to(phone, { autoAlpha: 1, x: 0, y: 0, duration: 0.95, ease: 'back.out(1.1)', clearProps: 'transform' }, 0.18);
+      if (spot) tl.to(spot, { autoAlpha: 1, duration: 0.8 }, 0.22);
+      features.forEach(function (f, i) {
+        var ic = f.querySelector('.feature-icon');
+        var at = 0.42 + i * 0.14;
+        tl.to(ic, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'back.out(1.8)' }, at)
+          .to(ic.nextElementSibling, { autoAlpha: 1, x: 0, duration: 0.55 }, at + 0.08); /* text 80ms after icon */
+      });
+      ScrollTrigger.create({ trigger: sec, start: 'top 68%', once: true, onEnter: function () { tl.play(); } });
+
+      /* spot illustration drifts at its own depth (distinct from the anchored phone) */
+      if (spot) gsap.to(spot, { yPercent: 16, ease: 'none',
+        scrollTrigger: { trigger: sec, start: 'top bottom', end: 'bottom top', scrub: 0.6 } });
+    });
+
     /* scroll progress bar */
     gsap.to('.progress', { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: 0.3 } });
 
@@ -2300,9 +2346,17 @@ html:not(.gsap-on) .nav-underline { display: none; }
     counters.forEach(function (c) { cIo.observe(c); });
   }
 
-  /* ── 05: living profile row updates itself on view ── */
+  /* deepen a phone's shadow while its micro-interaction plays */
+  function phoneGlow(phone) {
+    if (!phone) return;
+    phone.classList.add('micro-active');
+    setTimeout(function () { phone.classList.remove('micro-active'); }, 1500);
+  }
+
+  /* ── 05: living profile row updates itself on view (~60% section visibility) ── */
   var liveRow = document.getElementById('pf-row-live');
   if (liveRow) {
+    var profilePhone = liveRow.closest('.phone');
     var lpIo = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
         if (!e.isIntersecting) return;
@@ -2311,10 +2365,11 @@ html:not(.gsap-on) .nav-underline { display: none; }
         setTimeout(function () {
           document.getElementById('pf-live-value').textContent = 'Partner + 1 child';
           liveRow.classList.add('flash');
+          phoneGlow(profilePhone);
           setTimeout(function () { liveRow.classList.remove('flash'); }, 2600);
         }, delay);
       });
-    }, { threshold: 0.8 });
+    }, { threshold: 0.6 });
     lpIo.observe(liveRow);
   }
 
@@ -2328,6 +2383,7 @@ html:not(.gsap-on) .nav-underline { display: none; }
         var delay = reduced ? 0 : 1500;
         setTimeout(function () {
           document.getElementById('pl-task-tick').classList.add('ticked');
+          phoneGlow(planPhone);
           setTimeout(function () {
             document.getElementById('pl-fill').style.width = '36%';
             document.getElementById('pl-count').textContent = '4 of 11 tasks complete';
@@ -2335,7 +2391,7 @@ html:not(.gsap-on) .nav-underline { display: none; }
           }, reduced ? 0 : 450);
         }, delay);
       });
-    }, { threshold: 0.7 });
+    }, { threshold: 0.55 });
     plIo.observe(planPhone);
   }
 
@@ -2348,9 +2404,10 @@ html:not(.gsap-on) .nav-underline { display: none; }
         tcIo.unobserve(e.target);
         setTimeout(function () {
           document.getElementById('tc-answer').classList.add('answered');
+          phoneGlow(chatPhone);
         }, reduced ? 0 : 2200);
       });
-    }, { threshold: 0.7 });
+    }, { threshold: 0.55 });
     tcIo.observe(chatPhone);
   }
 
@@ -2363,9 +2420,10 @@ html:not(.gsap-on) .nav-underline { display: none; }
         alIo.unobserve(e.target);
         setTimeout(function () {
           document.getElementById('al-card').classList.add('shown');
+          phoneGlow(alertPhone);
         }, reduced ? 0 : 1200);
       });
-    }, { threshold: 0.7 });
+    }, { threshold: 0.55 });
     alIo.observe(alertPhone);
   }
 
