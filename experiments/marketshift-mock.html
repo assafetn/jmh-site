@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JMH — Market Shift Section Mock</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gloock&family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ── Tokens ── */
+    :root {
+      --bg:            oklch(97.5% 0.008 75);
+      --surface:       oklch(99%   0.004 75);
+      --ink:           oklch(16%   0.012 75);
+      --ink-muted:     oklch(45%   0.008 75);
+      --ink-faint:     oklch(65%   0.006 75);
+      --accent:        oklch(40%   0.11  168);
+      --accent-subtle: oklch(94%   0.025 168);
+      --border:        oklch(88%   0.008 75);
+      --border-strong: oklch(78%   0.010 75);
+      --font-display:  "Gloock", serif;
+      --font-body:     "Literata", serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Section ── */
+    .section-market {
+      padding: 96px 48px;
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    /* ── Two-column grid ── */
+    .market-grid {
+      display: grid;
+      grid-template-columns: 45fr 55fr;
+      gap: 64px;
+      align-items: start;
+    }
+
+    /* ── Narrative column ── */
+    .narrative-rule {
+      width: 32px;
+      height: 1px;
+      background: var(--accent);
+      margin-bottom: 24px;
+    }
+
+    .narrative h2 {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(36px, 4vw, 52px);
+      line-height: 1.1;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+
+    .narrative-subhead {
+      font-family: var(--font-body);
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--ink-muted);
+      margin-top: 12px;
+      max-width: 44ch;
+    }
+
+    .narrative-body {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .narrative-body p {
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--ink-muted);
+      max-width: 48ch;
+    }
+
+    /* ── Callout block ── */
+    .callout {
+      margin-top: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .callout-label {
+      font-family: var(--font-body);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .callout-term {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: 20px;
+      line-height: 1.2;
+      color: var(--ink);
+    }
+
+    .callout-definition {
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--ink-muted);
+      margin-top: 6px;
+    }
+
+    .narrative-footnote {
+      margin-top: 16px;
+      font-family: var(--font-body);
+      font-size: 12px;
+      color: var(--ink-faint);
+      line-height: 1.5;
+    }
+
+    .narrative-footnote .dagger {
+      color: var(--accent);
+    }
+
+    /* ── Diagram column ── */
+    .diagram {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* ── Era card ── */
+    .era-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      transition: border-color 150ms ease;
+    }
+
+    .era-card:hover {
+      border-color: var(--border-strong);
+    }
+
+    .era-label {
+      font-family: var(--font-body);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      display: block;
+    }
+
+    .era-name {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: 18px;
+      line-height: 1.2;
+      color: var(--ink);
+      margin-top: 4px;
+    }
+
+    .era-rule {
+      width: 100%;
+      height: 1px;
+      background: var(--border);
+      margin: 12px 0;
+    }
+
+    /* ── Service rows ── */
+    .service-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      list-style: none;
+    }
+
+    .service-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .service-name {
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--ink-muted);
+      flex-shrink: 0;
+    }
+
+    .service-dots {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+      position: relative;
+      top: -3px;
+      min-width: 12px;
+    }
+
+    .service-owner {
+      font-family: var(--font-body);
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .service-owner.muted {
+      color: var(--ink-muted);
+    }
+
+    .service-owner.stark {
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    /* ── Dividing strip ── */
+    .shift-strip {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 16px 0;
+    }
+
+    .shift-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .shift-label {
+      font-family: var(--font-body);
+      font-size: 11px;
+      color: var(--ink-faint);
+      padding: 0 12px;
+      white-space: nowrap;
+      letter-spacing: 0.02em;
+    }
+
+    /* ── Annotation panel ── */
+    .page-wrapper {
+      padding: 0 24px 64px;
+    }
+
+    .ann-label {
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      text-align: center;
+      display: block;
+      padding: 20px 0 0;
+    }
+
+    .annotations {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      max-width: 1120px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 32px;
+      font-family: var(--font-body);
+    }
+
+    .ann-group h3 {
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 12px;
+    }
+
+    .ann-group ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .ann-group li {
+      font-size: 13px;
+      color: var(--ink-muted);
+      line-height: 1.5;
+    }
+
+    .ann-group li strong {
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    .swatch {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      margin-right: 5px;
+      vertical-align: middle;
+      border: 1px solid var(--border);
+    }
+
+    @media (max-width: 768px) {
+      .section-market {
+        padding: 64px 24px;
+      }
+      .market-grid {
+        grid-template-columns: 1fr;
+        gap: 48px;
+      }
+      .narrative-body p,
+      .narrative-subhead {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <span class="ann-label">Market Shift — "The lump-sum era." — Desktop 1440 × 900</span>
+
+  <div class="section-market">
+    <div class="market-grid">
+
+      <!-- ── Narrative column (left) ── -->
+      <div class="narrative">
+        <div class="narrative-rule"></div>
+
+        <h2>The lump-sum era.</h2>
+
+        <p class="narrative-subhead">
+          A quiet industry change in how companies fund relocation created a gap no one planned for.
+        </p>
+
+        <div class="narrative-body">
+          <p>
+            For decades, companies moving employees abroad handled everything — housing search, visa filings, tax support, vendor relationships. Then, under cost pressure, the industry shifted. Today, roughly 40% of companies simply hand employees a lump sum and step back.
+          </p>
+          <p>
+            The employee now has a budget. What they don't have is the infrastructure, the expertise, or the vendor relationships the relocation company used to provide. That gap is new. It has no name in most HR systems.
+          </p>
+        </div>
+
+        <div class="callout">
+          <span class="callout-label">The gap this created</span>
+          <p class="callout-term">Prosumer Mobility Gap</p>
+          <p class="callout-definition">
+            The space between having a budget and having a system. The employee has purchasing power but none of the infrastructure they've just been handed responsibility for.
+          </p>
+        </div>
+
+        <p class="narrative-footnote">
+          <span class="dagger">†</span> Worldwide ERC / Brookfield Global Relocation Trends, 2024. $22B global relocation market.
+        </p>
+      </div>
+
+      <!-- ── Diagram column (right) ── -->
+      <figure class="diagram" aria-label="Comparison: how relocation responsibilities shifted from companies to employees">
+
+        <!-- Card 1: Before 2015 -->
+        <div class="era-card">
+          <span class="era-label">Before 2015</span>
+          <p class="era-name">Managed Relocation</p>
+          <div class="era-rule"></div>
+          <ul class="service-list" role="list">
+            <li class="service-row">
+              <span class="service-name">Housing &amp; Neighborhoods</span>
+              <span class="service-dots"></span>
+              <span class="service-owner muted">Relocation company</span>
+            </li>
+            <li class="service-row">
+              <span class="service-name">Visa &amp; Compliance</span>
+              <span class="service-dots"></span>
+              <span class="service-owner muted">Relocation company</span>
+            </li>
+            <li class="service-row">
+              <span class="service-name">Tax &amp; Banking</span>
+              <span class="service-dots"></span>
+              <span class="service-owner muted">Relocation company</span>
+            </li>
+            <li class="service-row">
+              <span class="service-name">Settling-in Support</span>
+              <span class="service-dots"></span>
+              <span class="service-owner muted">Relocation company</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Dividing strip -->
+        <div class="shift-strip" aria-hidden="true">
+          <div class="shift-line"></div>
+          <span class="shift-label">The shift &nbsp;·&nbsp; ~40% of companies by 2024</span>
+          <div class="shift-line"></div>
+        </div>
+
+        <!-- Card 2: Today -->
+        <div class="era-card">
+          <span class="era-label">Today</span>
+          <p class="era-name">Lump-Sum Package</p>
+          <div class="era-rule"></div>
+          <ul class="service-list" role="list">
+            <li class="service-row">
+              <span class="service-name">Housing &amp; Neighborhoods</span>
+              <span class="service-dots"></span>
+              <span class="service-owner stark">You</span>
+            </li>
+            <li class="service-row">
+              <span class="service-name">Visa &amp; Compliance</span>
+              <span class="service-dots"></span>
+              <span class="service-owner stark">You</span>
+            </li>
+            <li class="service-row">
+              <span class="service-name">Tax &amp; Banking</span>
+              <span class="service-dots"></span>
+              <span class="service-owner stark">You</span>
+            </li>
+            <li class="service-row">
+              <span class="service-name">Settling-in Support</span>
+              <span class="service-dots"></span>
+              <span class="service-owner stark">You</span>
+            </li>
+          </ul>
+        </div>
+
+      </figure>
+    </div>
+  </div>
+
+
+  <!-- ── Annotation panel ── -->
+  <div class="page-wrapper">
+    <div class="annotations">
+
+      <div class="ann-group">
+        <h3>Layout</h3>
+        <ul>
+          <li><strong>Desktop:</strong> 45 / 55 two-column, gap 64px</li>
+          <li><strong>Mobile:</strong> Single column, narrative first</li>
+          <li><strong>Container:</strong> max-width 1120px, px-48 desktop / px-24 mobile</li>
+          <li><strong>Section padding:</strong> py-96px desktop / py-64px mobile</li>
+          <li><strong>Columns align:</strong> align-items start (narrative + diagram top-aligned)</li>
+        </ul>
+      </div>
+
+      <div class="ann-group">
+        <h3>Diagram design</h3>
+        <ul>
+          <li><strong>Era cards:</strong> bg-surface, border-border, rounded-lg, p-24px</li>
+          <li><strong>Service rows:</strong> dot leader between name and owner — typographic, no extra decoration</li>
+          <li><strong>"Relocation company":</strong> ink-muted — recedes, reads as past</li>
+          <li><strong>"You":</strong> ink + font-weight 500 — stark, present tense, heavy</li>
+          <li><strong>Shift strip:</strong> 1px rule each side, centered label — not a card</li>
+          <li><strong>Accessibility:</strong> figure aria-label, ul role=list, shift strip aria-hidden</li>
+        </ul>
+      </div>
+
+      <div class="ann-group">
+        <h3>Typography</h3>
+        <ul>
+          <li><strong>h2:</strong> Gloock 400, clamp(36–52px), lh 1.1, ls −0.02em</li>
+          <li><strong>Subhead:</strong> Literata 400, 18px, lh 1.6, ink-muted</li>
+          <li><strong>Body:</strong> Literata 400, 16px, lh 1.6, ink-muted</li>
+          <li><strong>Callout term:</strong> Gloock 400, 20px, lh 1.2, ink</li>
+          <li><strong>Callout def:</strong> Literata 400, 15px, lh 1.6, ink-muted</li>
+          <li><strong>Era labels:</strong> Literata 600, 10px, tracking 0.1em, uppercase, ink-faint</li>
+          <li><strong>Era names:</strong> Gloock 400, 18px, ink</li>
+          <li><strong>Service names:</strong> Literata 400, 14px, ink-muted</li>
+          <li><strong>Footnote:</strong> Literata 400, 12px, ink-faint</li>
+        </ul>
+      </div>
+
+      <div class="ann-group">
+        <h3>Verdigris accent</h3>
+        <ul>
+          <li><strong>One accent:</strong> 32px × 1px rule above h2 — section anchor, matches Hero and Problem pattern</li>
+          <li><strong>Dagger (†):</strong> text-accent on footnote dagger only — functional, not decorative</li>
+          <li><strong>No accent on diagram:</strong> contrast is carried by ink vs ink-muted — color not needed</li>
+        </ul>
+      </div>
+
+      <div class="ann-group">
+        <h3>Animation (Framer Motion)</h3>
+        <ul>
+          <li><strong>Narrative block:</strong> whileInView, once, opacity 0→1, y +12→0, delay 0, 600ms</li>
+          <li><strong>"Before 2015" card:</strong> delay 100ms, 500ms</li>
+          <li><strong>Shift strip:</strong> delay 180ms, 400ms</li>
+          <li><strong>"Today" card:</strong> delay 260ms, 500ms</li>
+          <li><strong>Stagger logic:</strong> temporal order — Before enters first, shift second, Now third</li>
+          <li style="color: var(--accent)"><strong>prefers-reduced-motion:</strong> opacity 1, no translate, no delay</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

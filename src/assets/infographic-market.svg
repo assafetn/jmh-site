@@ -1,0 +1,199 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500">
+  <style>
+    .lbl { font-family: 'Gloock', Georgia, serif; }
+    .sub { font-family: 'Literata', Georgia, serif; }
+  </style>
+
+  <rect width="1200" height="500" fill="#f8f6f3"/>
+
+  <defs>
+    <filter id="jmh-glow">
+      <feDropShadow dx="0" dy="3" stdDeviation="10" flood-color="#2d7a6b" flood-opacity="0.14"/>
+    </filter>
+    <marker id="arr-gray" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <path d="M 0 0 L 8 3 L 0 6 Z" fill="#9ca3af"/>
+    </marker>
+    <marker id="arr-vd" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M 0 0 L 9 3 L 0 6 Z" fill="#2d7a6b"/>
+    </marker>
+    <marker id="arr-orange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <path d="M 0 0 L 10 3.5 L 0 7 Z" fill="#ea580c"/>
+    </marker>
+  </defs>
+
+  <!-- Column dividers -->
+  <line x1="385" y1="28" x2="385" y2="472" stroke="#e5e7eb" stroke-width="0.75"/>
+  <line x1="815" y1="28" x2="815" y2="472" stroke="#e5e7eb" stroke-width="0.75"/>
+
+  <!-- ═══ COLUMN HEADERS ═══ -->
+  <text x="185" y="26" text-anchor="middle" class="sub" font-size="8" fill="#9ca3af" letter-spacing="0.1em">FULL RELOCATION PACKAGE</text>
+  <text x="600" y="26" text-anchor="middle" class="sub" font-size="8" fill="#2d7a6b" letter-spacing="0.12em">JMH FILLS THIS</text>
+  <text x="1010" y="26" text-anchor="middle" class="sub" font-size="8" fill="#ea580c" letter-spacing="0.1em">LUMP SUM ERA</text>
+
+  <!-- ═══ LEFT COLUMN: GRAY SOLID ARROWS from employer to services ═══ -->
+  <line x1="197" y1="257" x2="135" y2="109" stroke="#9ca3af" stroke-width="1.2" marker-end="url(#arr-gray)"/>
+  <line x1="197" y1="257" x2="135" y2="215" stroke="#9ca3af" stroke-width="1.2" marker-end="url(#arr-gray)"/>
+  <line x1="197" y1="257" x2="135" y2="371" stroke="#9ca3af" stroke-width="1.2" marker-end="url(#arr-gray)"/>
+  <line x1="197" y1="257" x2="245" y2="121" stroke="#9ca3af" stroke-width="1.2" marker-end="url(#arr-gray)"/>
+  <line x1="197" y1="257" x2="245" y2="371" stroke="#9ca3af" stroke-width="1.2" marker-end="url(#arr-gray)"/>
+  <!-- "arranged + paid for" annotation -->
+  <text x="197" y="305" text-anchor="middle" class="sub" font-size="9" font-style="italic" fill="#9ca3af">arranged + paid for</text>
+
+  <!-- LEFT: Service node — Housing agent -->
+  <rect x="15" y="88" width="120" height="42" rx="5" fill="#f9fafb" stroke="#d1d5db" stroke-width="1.2"/>
+  <g transform="translate(21,103)" stroke="#9ca3af" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 5,0 L 10,4.5 L 10,11 L 7,11 L 7,7 L 3,7 L 3,11 L 0,11 L 0,4.5 Z"/>
+    <line x1="-1" y1="4.5" x2="5" y2="0"/><line x1="5" y1="0" x2="11" y2="4.5"/>
+  </g>
+  <text x="37" y="114" class="sub" font-size="10" fill="#4b5563">Housing agent</text>
+
+  <!-- LEFT: Service node — Visa lawyer -->
+  <rect x="15" y="194" width="120" height="42" rx="5" fill="#f9fafb" stroke="#d1d5db" stroke-width="1.2"/>
+  <g transform="translate(21,209)" stroke="#9ca3af" stroke-width="1.1" fill="none">
+    <line x1="5" y1="0" x2="5" y2="12"/><line x1="0" y1="3" x2="10" y2="3"/>
+    <circle cx="2" cy="7.5" r="2.5"/><circle cx="8" cy="7.5" r="2.5"/>
+    <line x1="0" y1="3" x2="2" y2="5"/><line x1="10" y1="3" x2="8" y2="5"/>
+  </g>
+  <text x="37" y="220" class="sub" font-size="10" fill="#4b5563">Visa lawyer</text>
+
+  <!-- LEFT: Service node — Tax advisor -->
+  <rect x="15" y="350" width="120" height="42" rx="5" fill="#f9fafb" stroke="#d1d5db" stroke-width="1.2"/>
+  <g transform="translate(21,362)" stroke="#9ca3af" stroke-width="1.1" fill="none" stroke-linecap="round">
+    <rect x="1" y="1" width="9" height="10" rx="1"/>
+    <line x1="3" y1="5.5" x2="5" y2="5.5"/><line x1="4" y1="4.5" x2="4" y2="6.5"/>
+    <line x1="6" y1="5.5" x2="8" y2="5.5"/>
+    <line x1="6" y1="8" x2="8" y2="8"/>
+    <rect x="2" y="2" width="7" height="2.5" fill="#e5e7eb" stroke="none"/>
+  </g>
+  <text x="37" y="376" class="sub" font-size="10" fill="#4b5563">Tax advisor</text>
+
+  <!-- LEFT: Service node — Language school -->
+  <rect x="245" y="100" width="120" height="42" rx="5" fill="#f9fafb" stroke="#d1d5db" stroke-width="1.2"/>
+  <g transform="translate(251,114)" stroke="#9ca3af" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="5" cy="4" r="4"/>
+    <path d="M 2,7.5 L 1,10 L 4.5,7.8"/>
+    <circle cx="9" cy="7.5" r="3" opacity="0.55"/>
+    <path d="M 7,10.5 L 6.5,12 L 9,10.5" opacity="0.55"/>
+  </g>
+  <text x="267" y="126" class="sub" font-size="10" fill="#4b5563">Language school</text>
+
+  <!-- LEFT: Service node — Spouse support -->
+  <rect x="245" y="350" width="120" height="42" rx="5" fill="#f9fafb" stroke="#d1d5db" stroke-width="1.2"/>
+  <g transform="translate(251,362)" stroke="#9ca3af" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 5,9 C 0.5,5.5 0,1.5 2.5,1 C 4,0.5 5,2.5 5,2.5 C 5,2.5 6,0.5 7.5,1 C 10,1.5 9.5,5.5 5,9 Z"/>
+  </g>
+  <text x="267" y="376" class="sub" font-size="10" fill="#4b5563">Spouse support</text>
+
+  <!-- LEFT: Employer HR central node -->
+  <rect x="120" y="228" width="154" height="58" rx="6" fill="#f3f4f6" stroke="#9ca3af" stroke-width="1.5"/>
+  <!-- Building2 icon -->
+  <g transform="translate(136,241)" stroke="#6b7280" stroke-width="1.3" fill="none" stroke-linecap="round">
+    <rect x="0" y="5" width="14" height="10" rx="1"/>
+    <rect x="3" y="0" width="8" height="5" rx="1"/>
+    <line x1="4" y1="11" x2="6" y2="11"/>
+    <line x1="8" y1="11" x2="10" y2="11"/>
+    <line x1="5.5" y1="11" x2="5.5" y2="15"/>
+    <line x1="8.5" y1="11" x2="8.5" y2="15"/>
+  </g>
+  <text x="160" y="253" class="lbl" font-size="12" fill="#374151">Employer HR</text>
+  <text x="160" y="269" class="sub" font-size="9" font-style="italic" fill="#9ca3af">full coverage</text>
+
+  <!-- ═══ CENTER COLUMN ═══ -->
+  <!-- "The shift" arrow -->
+  <line x1="398" y1="52" x2="808" y2="52" stroke="#ea580c" stroke-width="2.5" marker-end="url(#arr-orange)"/>
+  <text x="600" y="40" text-anchor="middle" class="sub" font-size="9" fill="#ea580c" letter-spacing="0.06em">THE SHIFT</text>
+
+  <!-- JMH node (elevated with drop shadow) -->
+  <rect x="448" y="214" width="304" height="90" rx="12" fill="#e8f2f0" stroke="#2d7a6b" stroke-width="2" filter="url(#jmh-glow)"/>
+  <!-- Sparkles icon -->
+  <g transform="translate(474,252)" fill="#2d7a6b">
+    <path d="M 5,0 L 6.2,3.5 L 10,4.5 L 6.2,5.5 L 5,9 L 3.8,5.5 L 0,4.5 L 3.8,3.5 Z"/>
+    <path d="M 12,1 L 12.7,2.8 L 14.5,3.3 L 12.7,3.8 L 12,5.5 L 11.3,3.8 L 9.5,3.3 L 11.3,2.8 Z" opacity="0.7"/>
+    <circle cx="15" cy="9" r="1.5" opacity="0.45"/>
+  </g>
+  <text x="504" y="254" class="lbl" font-size="26" fill="#2d7a6b">JMH</text>
+  <text x="504" y="274" class="sub" font-size="12" font-style="italic" fill="#2d7a6b">Relocation OS</text>
+  <text x="504" y="289" class="sub" font-size="9" fill="#5a9d94">guides you through all of it</text>
+
+  <!-- Verdigris "guided" arrow from JMH → "You" -->
+  <line x1="752" y1="259" x2="974" y2="259" stroke="#2d7a6b" stroke-width="2" marker-end="url(#arr-vd)"/>
+  <text x="863" y="249" text-anchor="middle" class="sub" font-size="10" font-style="italic" fill="#2d7a6b">guided</text>
+
+  <!-- Bottom label -->
+  <text x="600" y="478" text-anchor="middle" class="sub" font-size="10" font-style="italic" fill="#a8a4a0">The gap between expectation and reality</text>
+
+  <!-- ═══ RIGHT COLUMN: RED DASHED ARROWS from "You" to services ═══ -->
+  <line x1="1010" y1="257" x2="987" y2="118" stroke="#dc2626" stroke-width="1.1" stroke-dasharray="4,3" opacity="0.5"/>
+  <line x1="1010" y1="257" x2="987" y2="215" stroke="#dc2626" stroke-width="1.1" stroke-dasharray="4,3" opacity="0.5"/>
+  <line x1="1010" y1="257" x2="987" y2="371" stroke="#dc2626" stroke-width="1.1" stroke-dasharray="4,3" opacity="0.5"/>
+  <line x1="1010" y1="257" x2="1065" y2="121" stroke="#dc2626" stroke-width="1.1" stroke-dasharray="4,3" opacity="0.5"/>
+  <line x1="1010" y1="257" x2="1065" y2="371" stroke="#dc2626" stroke-width="1.1" stroke-dasharray="4,3" opacity="0.5"/>
+
+  <!-- RIGHT: Service node (ghost) — Housing agent -->
+  <rect x="865" y="88" width="120" height="42" rx="5" fill="#faf9f7" stroke="#d1d5db" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="869" y1="92" x2="981" y2="126" stroke="#dc2626" stroke-width="1.1" opacity="0.3"/>
+  <line x1="981" y1="92" x2="869" y2="126" stroke="#dc2626" stroke-width="1.1" opacity="0.3"/>
+  <g transform="translate(871,103)" stroke="#c4c4c4" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 5,0 L 10,4.5 L 10,11 L 7,11 L 7,7 L 3,7 L 3,11 L 0,11 L 0,4.5 Z"/>
+    <line x1="-1" y1="4.5" x2="5" y2="0"/><line x1="5" y1="0" x2="11" y2="4.5"/>
+  </g>
+  <text x="887" y="114" class="sub" font-size="10" fill="#9ca3af">Housing agent</text>
+
+  <!-- RIGHT: Service node (ghost) — Visa lawyer -->
+  <rect x="865" y="194" width="120" height="42" rx="5" fill="#faf9f7" stroke="#d1d5db" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="869" y1="198" x2="981" y2="232" stroke="#dc2626" stroke-width="1.1" opacity="0.3"/>
+  <line x1="981" y1="198" x2="869" y2="232" stroke="#dc2626" stroke-width="1.1" opacity="0.3"/>
+  <g transform="translate(871,209)" stroke="#c4c4c4" stroke-width="1.1" fill="none">
+    <line x1="5" y1="0" x2="5" y2="12"/><line x1="0" y1="3" x2="10" y2="3"/>
+    <circle cx="2" cy="7.5" r="2.5"/><circle cx="8" cy="7.5" r="2.5"/>
+    <line x1="0" y1="3" x2="2" y2="5"/><line x1="10" y1="3" x2="8" y2="5"/>
+  </g>
+  <text x="887" y="220" class="sub" font-size="10" fill="#9ca3af">Visa lawyer</text>
+
+  <!-- RIGHT: Service node (ghost) — Tax advisor -->
+  <rect x="865" y="350" width="120" height="42" rx="5" fill="#faf9f7" stroke="#d1d5db" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="869" y1="354" x2="981" y2="388" stroke="#dc2626" stroke-width="1.1" opacity="0.3"/>
+  <line x1="981" y1="354" x2="869" y2="388" stroke="#dc2626" stroke-width="1.1" opacity="0.3"/>
+  <g transform="translate(871,362)" stroke="#c4c4c4" stroke-width="1.1" fill="none" stroke-linecap="round">
+    <rect x="1" y="1" width="9" height="10" rx="1"/>
+    <line x1="3" y1="5.5" x2="5" y2="5.5"/><line x1="4" y1="4.5" x2="4" y2="6.5"/>
+    <line x1="6" y1="5.5" x2="8" y2="5.5"/>
+    <line x1="6" y1="8" x2="8" y2="8"/>
+    <rect x="2" y="2" width="7" height="2.5" fill="#ece9e5" stroke="none"/>
+  </g>
+  <text x="887" y="376" class="sub" font-size="10" fill="#9ca3af">Tax advisor</text>
+
+  <!-- RIGHT: Service node (ghost) — Language school -->
+  <rect x="1065" y="100" width="120" height="42" rx="5" fill="#faf9f7" stroke="#d1d5db" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="1069" y1="104" x2="1181" y2="138" stroke="#dc2626" stroke-width="1.1" opacity="0.3"/>
+  <line x1="1181" y1="104" x2="1069" y2="138" stroke="#dc2626" stroke-width="1.1" opacity="0.3"/>
+  <g transform="translate(1071,114)" stroke="#c4c4c4" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="5" cy="4" r="4"/>
+    <path d="M 2,7.5 L 1,10 L 4.5,7.8"/>
+    <circle cx="9" cy="7.5" r="3" opacity="0.55"/>
+    <path d="M 7,10.5 L 6.5,12 L 9,10.5" opacity="0.55"/>
+  </g>
+  <text x="1087" y="126" class="sub" font-size="10" fill="#9ca3af">Language school</text>
+
+  <!-- RIGHT: Service node (ghost) — Spouse support -->
+  <rect x="1065" y="350" width="120" height="42" rx="5" fill="#faf9f7" stroke="#d1d5db" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="1069" y1="354" x2="1181" y2="388" stroke="#dc2626" stroke-width="1.1" opacity="0.3"/>
+  <line x1="1181" y1="354" x2="1069" y2="388" stroke="#dc2626" stroke-width="1.1" opacity="0.3"/>
+  <g transform="translate(1071,362)" stroke="#c4c4c4" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 5,9 C 0.5,5.5 0,1.5 2.5,1 C 4,0.5 5,2.5 5,2.5 C 5,2.5 6,0.5 7.5,1 C 10,1.5 9.5,5.5 5,9 Z"/>
+  </g>
+  <text x="1087" y="376" class="sub" font-size="10" fill="#9ca3af">Spouse support</text>
+
+  <!-- "Same complexity. No support." -->
+  <text x="1010" y="452" text-anchor="middle" class="sub" font-size="10" font-style="italic" fill="#ea580c" opacity="0.75">Same complexity. No support.</text>
+
+  <!-- RIGHT: "You" central node -->
+  <circle cx="1010" cy="257" r="34" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
+  <!-- User icon -->
+  <g transform="translate(994,240)" stroke="#ea580c" stroke-width="1.8" fill="none" stroke-linecap="round">
+    <circle cx="8" cy="6" r="5"/>
+    <path d="M 0,18 C 0,12 16,12 16,18"/>
+  </g>
+  <text x="1010" y="283" text-anchor="middle" class="lbl" font-size="11" fill="#ea580c">You</text>
+
+</svg>

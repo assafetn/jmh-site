@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JMH — Problem Section Mock</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gloock&family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg:            oklch(97.5% 0.008 75);
+      --surface:       oklch(99%   0.004 75);
+      --ink:           oklch(16%   0.012 75);
+      --ink-muted:     oklch(45%   0.008 75);
+      --ink-faint:     oklch(65%   0.006 75);
+      --accent:        oklch(40%   0.11  168);
+      --accent-subtle: oklch(94%   0.025 168);
+      --border:        oklch(88%   0.008 75);
+      --border-strong: oklch(78%   0.010 75);
+
+      --font-display: "Gloock", serif;
+      --font-body:    "Literata", serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Section ── */
+    .section-problem {
+      padding: 96px 0;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding-left: 48px;
+      padding-right: 48px;
+    }
+
+    /* ── Heading block ── */
+    .section-rule {
+      width: 32px;
+      height: 1px;
+      background: var(--accent);
+      margin-bottom: 24px;
+    }
+
+    .section-heading {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(36px, 4vw, 52px);
+      line-height: 1.1;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+
+    .section-subhead {
+      font-family: var(--font-body);
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--ink-muted);
+      max-width: 56ch;
+      margin-top: 12px;
+    }
+
+    /* ── 2×2 grid ── */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-top: 64px;
+    }
+
+    /* ── Cards ── */
+    .problem-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      transition: border-color 150ms ease;
+    }
+
+    .problem-card:hover {
+      border-color: var(--border-strong);
+    }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: 20px;
+      color: var(--ink);
+      margin-top: 16px;
+      letter-spacing: -0.01em;
+    }
+
+    .card-body {
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--ink-muted);
+      margin-top: 8px;
+    }
+
+    .card-citation {
+      font-family: var(--font-body);
+      font-size: 12px;
+      color: var(--ink-faint);
+      margin-top: 12px;
+    }
+
+    .card-citation .dagger {
+      color: var(--accent);
+    }
+
+    /* ── Card 1: Tab strip anchor ── */
+    .tab-strip {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 8px 8px 0 0;
+      background: var(--bg);
+    }
+
+    .tab-item {
+      font-family: var(--font-body);
+      font-size: 11px;
+      color: var(--ink-faint);
+      padding: 7px 12px;
+      border-right: 1px solid var(--border);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .tab-item:last-child {
+      border-right: none;
+    }
+
+    .tab-item.active {
+      background: var(--surface);
+      color: var(--ink-muted);
+      border-bottom: 1px solid var(--surface);
+      margin-bottom: -1px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .tab-strip-body {
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      background: var(--surface);
+      padding: 10px 12px;
+      font-family: var(--font-body);
+      font-size: 11px;
+      color: var(--ink-faint);
+      font-style: italic;
+    }
+
+    /* ── Card 2: AI snippet anchor ── */
+    .ai-snippet {
+      background: var(--accent-subtle);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-family: var(--font-body);
+      font-style: italic;
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--ink-muted);
+      position: relative;
+    }
+
+    .ai-badge {
+      font-family: var(--font-body);
+      font-style: normal;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    /* ── Card 3: Isolation numeral anchor ── */
+    .isolation-numeral {
+      font-family: var(--font-display);
+      font-size: 56px;
+      line-height: 1;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      font-feature-settings: "onum" 1;
+    }
+
+    .isolation-unit {
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--ink-faint);
+      margin-top: 4px;
+    }
+
+    /* ── Card 4: Compliance calendar anchor ── */
+    .compliance-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 8px);
+      gap: 4px;
+    }
+
+    .cg-cell {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      background: var(--border);
+    }
+
+    .cg-cell.marked {
+      background: var(--accent-subtle);
+    }
+
+    .cg-cell.urgent {
+      background: oklch(92% 0.03 25);
+    }
+
+    .cg-cell.today {
+      background: var(--accent);
+    }
+
+    /* ── Annotation panel ── */
+    .page-wrapper {
+      padding: 0 24px 64px;
+    }
+
+    .ann-label {
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      text-align: center;
+      display: block;
+      padding: 20px 0 0;
+    }
+
+    .annotations {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      max-width: 1120px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 32px;
+      font-family: var(--font-body);
+    }
+
+    .ann-group h3 {
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 12px;
+    }
+
+    .ann-group ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .ann-group li {
+      font-size: 13px;
+      color: var(--ink-muted);
+      line-height: 1.5;
+    }
+
+    .ann-group li strong {
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    .swatch {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      margin-right: 5px;
+      vertical-align: middle;
+      border: 1px solid var(--border);
+    }
+
+    @media (max-width: 768px) {
+      .section-problem {
+        padding-left: 24px;
+        padding-right: 24px;
+        padding-top: 64px;
+        padding-bottom: 64px;
+      }
+      .problem-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        margin-top: 48px;
+      }
+      .problem-card {
+        padding: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <span class="ann-label">Problem section — "Ten tabs, no answer." — Desktop 1440 × 900</span>
+
+  <div class="section-problem">
+
+    <!-- Verdigris rule — echoes Hero, one per section -->
+    <div class="section-rule"></div>
+
+    <h2 class="section-heading">Ten tabs, no answer.</h2>
+    <p class="section-subhead">International relocation is broken in four compounding ways. Most people only discover this mid-move.</p>
+
+    <div class="problem-grid">
+
+      <!-- Card 1: Fragmentation — tab strip anchor -->
+      <div class="problem-card">
+        <div>
+          <div class="tab-strip">
+            <div class="tab-item">Housing</div>
+            <div class="tab-item active">Visa</div>
+            <div class="tab-item">Insurance</div>
+            <div class="tab-item">Tax</div>
+            <div class="tab-item">Schools</div>
+          </div>
+          <div class="tab-strip-body">No results match all your filters.</div>
+        </div>
+
+        <p class="card-title">Everything's somewhere else.</p>
+        <p class="card-body">
+          Housing, visa, tax, schools — each lives in a different system, none of which talk to each other.
+          The information exists. It just doesn't add up.
+        </p>
+      </div>
+
+      <!-- Card 2: AI trust — snippet anchor -->
+      <div class="problem-card">
+        <div class="ai-snippet">
+          <span class="ai-badge">AI Answer</span>
+          "As an EU citizen, you are generally entitled to reside in Germany without a formal registration requirement in most cases, though local rules may vary…"
+        </div>
+
+        <p class="card-title">AI that guesses on legal questions.</p>
+        <p class="card-body">
+          General-purpose AI has a 69% hallucination rate on cross-border legal queries.
+          That's not a minor inaccuracy — it's the kind that costs you your right of residence.
+        </p>
+        <p class="card-citation"><span class="dagger">†</span> Stanford HAI Legal AI Benchmark, 2024</p>
+      </div>
+
+      <!-- Card 3: Isolation — display numeral anchor -->
+      <div class="problem-card">
+        <div>
+          <p class="isolation-numeral">40%</p>
+          <p class="isolation-unit">of international assignments fail</p>
+        </div>
+
+        <p class="card-title">Alone in a city that doesn't know you yet.</p>
+        <p class="card-body">
+          Logistics are solvable. The harder problem is that no one tells you where to go, who to trust, or what's normal.
+          Isolation compounds every other friction.
+        </p>
+        <p class="card-citation"><span class="dagger">†</span> Brookfield Global Relocation Trends, 2023</p>
+      </div>
+
+      <!-- Card 4: Compliance — calendar grid anchor -->
+      <div class="problem-card">
+        <div>
+          <div class="compliance-grid">
+            <!-- Row 1: week labels implied, 28 cells = 4 rows × 7 -->
+            <div class="cg-cell"></div><div class="cg-cell"></div><div class="cg-cell marked"></div><div class="cg-cell"></div><div class="cg-cell"></div><div class="cg-cell marked"></div><div class="cg-cell"></div>
+            <div class="cg-cell marked"></div><div class="cg-cell"></div><div class="cg-cell urgent"></div><div class="cg-cell marked"></div><div class="cg-cell"></div><div class="cg-cell"></div><div class="cg-cell marked"></div>
+            <div class="cg-cell"></div><div class="cg-cell urgent"></div><div class="cg-cell today"></div><div class="cg-cell"></div><div class="cg-cell urgent"></div><div class="cg-cell"></div><div class="cg-cell"></div>
+            <div class="cg-cell marked"></div><div class="cg-cell"></div><div class="cg-cell"></div><div class="cg-cell urgent"></div><div class="cg-cell"></div><div class="cg-cell marked"></div><div class="cg-cell"></div>
+          </div>
+          <p style="font-family: var(--font-body); font-size: 11px; color: var(--ink-faint); margin-top: 8px; letter-spacing: 0.04em;">
+            <span style="display:inline-block; width:8px; height:8px; background:var(--accent); border-radius:2px; vertical-align:middle; margin-right:4px;"></span>today &nbsp;
+            <span style="display:inline-block; width:8px; height:8px; background:oklch(92% 0.03 25); border-radius:2px; vertical-align:middle; margin-right:4px;"></span>deadline &nbsp;
+            <span style="display:inline-block; width:8px; height:8px; background:var(--accent-subtle); border-radius:2px; vertical-align:middle; margin-right:4px;"></span>filing window
+          </p>
+        </div>
+
+        <p class="card-title">Deadlines you didn't know existed.</p>
+        <p class="card-body">
+          Anmeldung, Steuer-ID, health insurance, pension opt-out windows — each has a hard cutoff.
+          Missing them means fines, gaps in coverage, or benefits you can never recover.
+        </p>
+      </div>
+
+    </div>
+    <!-- /problem-grid -->
+
+  </div>
+  <!-- /section-problem -->
+
+
+  <div class="page-wrapper">
+
+    <div class="annotations">
+
+      <div class="ann-group">
+        <h3>Verdigris accent decision</h3>
+        <ul>
+          <li><strong>32px × 1px rule</strong><br>Same pattern as Hero — anchors the section visually. One per viewport. bg-accent.</li>
+          <li><strong>AI snippet background</strong><br>bg-accent-subtle only — subtle, not a second accent hit.</li>
+          <li><strong>Dagger citations (†)</strong><br>text-accent on dagger character only. Quiet, not decorative.</li>
+        </ul>
+      </div>
+
+      <div class="ann-group">
+        <h3>Card anchors</h3>
+        <ul>
+          <li><strong>Card 1</strong><br>Browser tab strip — "no results" punchline makes the fragmentation tangible</li>
+          <li><strong>Card 2</strong><br>AI snippet block — accent-subtle bg, italic Literata, 10px uppercase badge</li>
+          <li><strong>Card 3</strong><br>40% display numeral — Gloock 56px, oldstyle figures, floats alone above body</li>
+          <li><strong>Card 4</strong><br>7×4 CSS grid, 8px cells, color-coded: accent/urgent/filing. Legend inline.</li>
+        </ul>
+      </div>
+
+      <div class="ann-group">
+        <h3>Typography</h3>
+        <ul>
+          <li><strong>Section heading</strong><br>Gloock 400, clamp(36–52px), lh 1.1, ls −0.02em</li>
+          <li><strong>Subhead</strong><br>Literata 400, 18px, lh 1.6, text-ink-muted, max 56ch</li>
+          <li><strong>Card title</strong><br>Gloock 400, 20px, ls −0.01em, mt-4 (16px)</li>
+          <li><strong>Card body</strong><br>Literata 400, 16px, lh 1.6, text-ink-muted, max 2 sentences</li>
+          <li><strong>Citation</strong><br>Literata 400, 12px, text-ink-faint, mt-3 (12px)</li>
+        </ul>
+      </div>
+
+      <div class="ann-group">
+        <h3>Spacing</h3>
+        <ul>
+          <li><strong>Section padding:</strong> 96px top/bottom desktop, 64px mobile</li>
+          <li><strong>Rule → heading:</strong> 24px (mb-6)</li>
+          <li><strong>Heading → grid:</strong> 64px (mt-16)</li>
+          <li><strong>Grid gap:</strong> 32px desktop, 24px mobile</li>
+          <li><strong>Card padding:</strong> 32px desktop, 24px mobile</li>
+          <li><strong>Anchor → title:</strong> 16px (mt-4)</li>
+          <li><strong>Title → body:</strong> 8px (mt-2)</li>
+        </ul>
+      </div>
+
+      <div class="ann-group">
+        <h3>Animation (Framer Motion)</h3>
+        <ul>
+          <li><strong>Trigger:</strong> whileInView, viewport once: true, amount: 0.2</li>
+          <li><strong>Heading block</strong><br>opacity 0→1, y +12→0, delay 0ms, 600ms ease-out</li>
+          <li><strong>Cards (staggered)</strong><br>opacity 0→1, y +16→0<br>Card 1: delay 80ms<br>Card 2: delay 160ms<br>Card 3: delay 240ms<br>Card 4: delay 320ms<br>Each 500ms ease-out</li>
+          <li style="color: var(--accent)"><strong>prefers-reduced-motion:</strong><br>opacity 1, no translate, no delay</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>
