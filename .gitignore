@@ -1,27 +1,19 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+# This repo intentionally tracks ONLY the deliverable: the self-contained V2 site
+# and the illustrations it loads. Everything else (React scaffold, experiments,
+# docs, PNG originals, node_modules, local config) stays on disk but out of git.
 
-node_modules
-dist
-dist-ssr
-*.local
+# Ignore everything at the root...
+/*
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# ...except the deliverable and the files that support it:
+!/.gitignore
+!/JMH_Website_V2.html
+!/assets/
 
-# Claude Code local settings (personal)
-.claude/settings.local.json
+# Inside assets/, keep only the illustrations folder...
+/assets/*
+!/assets/illustrations/
+
+# ...and inside that, only the WebP images the site actually loads.
+/assets/illustrations/*
+!/assets/illustrations/*.webp
